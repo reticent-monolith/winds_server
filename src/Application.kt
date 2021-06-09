@@ -1,0 +1,59 @@
+package com.reticentmonolith
+
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.reticentmonolith.models.Dispatch
+import com.reticentmonolith.models.Rider
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.response.*
+import io.ktor.request.*
+import io.ktor.routing.*
+import io.ktor.http.*
+import com.reticentmonolith.repo.MongoDispatchRepo
+import io.ktor.jackson.*
+import org.litote.kmongo.id.jackson.IdJacksonModule
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
+
+fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
+
+@Suppress("unused") // Referenced in application.conf
+@kotlin.jvm.JvmOverloads
+fun Application.module(testing: Boolean = false) {
+
+    val repo = MongoDispatchRepo()
+
+    val mapper = jacksonObjectMapper()
+    mapper.registerModule(IdJacksonModule())
+    mapper.registerModule(JavaTimeModule())
+
+    install(ContentNegotiation) {
+        jackson()
+    }
+
+    repo.createDispatch(
+        Dispatch(
+            bt_radio = "kdjlfg",
+            wind_degrees = 3,
+            wind_speed = 3.7,
+            winds_instructor = "kashd"
+        ).apply {
+            this.riders[2] = Rider(67)
+        }
+    )
+
+    routing {
+        get("/") {
+            val dispatch = repo.getLastDispatch()
+
+            if (dispatch != null) {
+                call.response.status(HttpStatusCode.OK)
+                call.respond(dispatch)
+
+            }
+        }
+    }
+}
+
