@@ -7,14 +7,11 @@ import com.reticentmonolith.models.Rider
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.response.*
-import io.ktor.request.*
 import io.ktor.routing.*
 import io.ktor.http.*
 import com.reticentmonolith.repo.MongoDispatchRepo
 import io.ktor.jackson.*
 import org.litote.kmongo.id.jackson.IdJacksonModule
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 
 fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
@@ -25,12 +22,8 @@ fun Application.module(testing: Boolean = false) {
 
     val repo = MongoDispatchRepo()
 
-    val mapper = jacksonObjectMapper()
-    mapper.registerModule(IdJacksonModule())
-    mapper.registerModule(JavaTimeModule())
-
     install(ContentNegotiation) {
-        jackson()
+        register(ContentType.Application.Json, JacksonConverter(JsonMapper.defaultMapper))
     }
 
     repo.createDispatch(
@@ -46,13 +39,12 @@ fun Application.module(testing: Boolean = false) {
 
     routing {
         get("/") {
-            val dispatch = repo.getLastDispatch()
+            call.response.status(HttpStatusCode.OK)
 
-            if (dispatch != null) {
-                call.response.status(HttpStatusCode.OK)
-                call.respond(dispatch)
+            val dispatches = repo.getAllDispatches()
 
-            }
+            call.respond(dispatches)
+
         }
     }
 }
