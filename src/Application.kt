@@ -1,9 +1,5 @@
 package com.reticentmonolith
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.reticentmonolith.models.Dispatch
-import com.reticentmonolith.models.Rider
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.response.*
