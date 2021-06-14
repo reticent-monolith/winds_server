@@ -2,9 +2,11 @@ package com.reticentmonolith.repo
 
 import com.mongodb.client.MongoDatabase
 import com.reticentmonolith.models.Dispatch
+import org.bson.types.ObjectId
 import java.time.LocalDate
 
 import org.litote.kmongo.*
+import org.litote.kmongo.id.toId
 
 class MongoDispatchRepo: DispatchRepoInterface {
 
@@ -33,16 +35,16 @@ class MongoDispatchRepo: DispatchRepoInterface {
         return windsData.findOneById(id)
     }
 
-    override fun updateDispatchById(id: Id<Dispatch>, update: Dispatch): Boolean {
+    override fun updateDispatchById(id: Id<Dispatch>, update: Dispatch): Dispatch? {
         val oldDispatch = getDispatchById(id)
         if (oldDispatch != null) {
             update.time = oldDispatch.time
             update.date = oldDispatch.date
             update._id = oldDispatch._id
             windsData.updateOneById(id, update)
-            return true
+            return update
         }
-        return false
+        return null
     }
 
     override fun updateLastDispatch(update: Dispatch): Boolean {
@@ -64,13 +66,11 @@ class MongoDispatchRepo: DispatchRepoInterface {
         return todaysDispatches.last()
     }
 
-    override fun addSpeedsToLastDispatch(line4: Int?, line3: Int?, line2: Int?, line1: Int?) {
-        val lastDispatch = getLastDispatch() ?: return
-        lastDispatch.riders.get(4)?.speed = line4
-        lastDispatch.riders.get(3)?.speed = line3
-        lastDispatch.riders.get(2)?.speed = line2
-        lastDispatch.riders.get(1)?.speed = line1
-        updateLastDispatch(lastDispatch)
-
+    override fun addSpeedsToDispatch(dispatch: Dispatch, line4: Int?, line3: Int?, line2: Int?, line1: Int?) {
+        dispatch.riders[4]?.speed = line4
+        dispatch.riders[3]?.speed = line3
+        dispatch.riders[2]?.speed = line2
+        dispatch.riders[1]?.speed = line1
+        updateDispatchById(dispatch._id, dispatch)
     }
 }
