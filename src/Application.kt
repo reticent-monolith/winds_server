@@ -26,19 +26,45 @@ fun Application.module(testing: Boolean = false) {
     val repo = MongoDispatchRepo()
 
     install(ContentNegotiation) {
-        register(ContentType.Application.Json, JacksonConverter(JsonMapper.defaultMapper))
+        register(
+            ContentType.Application.Json,
+            JacksonConverter(JsonMapper.defaultMapper)
+        )
     }
+
+    install(CORS) {
+        method(HttpMethod.Options)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Patch)
+        header(HttpHeaders.Authorization)
+        header(HttpHeaders.AccessControlAllowOrigin)
+        allowNonSimpleContentTypes = true
+        allowCredentials = true
+        allowSameOrigin = true
+        anyHost()
+    }
+
 
     routing {
         get("/") {
             call.response.status(HttpStatusCode.OK)
             val dispatches = repo.getAllDispatches()
-            call.response.headers.append(
-                HttpHeaders.AccessControlAllowOrigin, "*")
             call.respond(dispatches)
         }
+
+        post("/") {
+            call.response.status(HttpStatusCode.OK)
+            println("#### Getting dispatch...####")
+            val dispatch = call.receive<Dispatch>()
+            println("#### Got $dispatch ####")
+            repo.createDispatch(dispatch)
+            call.respond(dispatch._id)
+        }
+
         get("/getbydate/{date}") {
             call.response.status(HttpStatusCode.OK)
+
             val reqDate = call.parameters["date"] ?: return@get call.respondText(
                 "Malformed date", status=HttpStatusCode.BadRequest
             )
@@ -46,12 +72,6 @@ fun Application.module(testing: Boolean = false) {
             val date = LocalDate.of(listDate[0], listDate[1], listDate[2])
             val dispatches = repo.getDispatchesByDate(date)
             call.respond(dispatches)
-        }
-
-        post("/") {
-            val dispatch = call.receive<Dispatch>()
-            repo.createDispatch(dispatch)
-            call.respond(HttpStatusCode.Created, dispatch._id)
         }
 
         post("/update/{id}") {
@@ -117,7 +137,6 @@ fun Application.module(testing: Boolean = false) {
             repo.addSpeedsToDispatch(dispatch, speeds[4], speeds[3], speeds[2], speeds[1])
             call.respond("Speeds added")
         }
-
     }
 }
 
