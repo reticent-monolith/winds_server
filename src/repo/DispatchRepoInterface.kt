@@ -19,6 +19,6 @@ interface DispatchRepoInterface {
     fun deleteDispatchById(id: Id<Dispatch>)
 
     fun getLastDispatch(): Dispatch? 
-    fun addSpeedsToDispatch(dispatch: Dispatch, line4: Int?=null, line3: Int?=null, line2: Int?=null, line1: Int?=null)
+    fun addSpeedsToDispatch(id: Id<Dispatch>, line: Int?, speed: Int?)
 
 }

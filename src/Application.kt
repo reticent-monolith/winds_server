@@ -14,6 +14,7 @@ import org.litote.kmongo.id.toId
 import java.time.LocalDate
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import org.litote.kmongo.Id
 import java.lang.IllegalArgumentException
 
 
@@ -47,95 +48,32 @@ fun Application.module(testing: Boolean = false) {
 
 
     routing {
-        get("/") {
+        get("/all/") {
             call.response.status(HttpStatusCode.OK)
             val dispatches = repo.getAllDispatches()
             call.respond(dispatches)
         }
 
-        post("/") {
+        post("/add/") {
             call.response.status(HttpStatusCode.OK)
-            println("#### Getting dispatch...####")
             val dispatch = call.receive<Dispatch>()
-            println("#### Got $dispatch ####")
             repo.createDispatch(dispatch)
             call.respond(dispatch._id)
         }
 
-        get("/getbydate/{date}") {
+        post("/delete/") {
             call.response.status(HttpStatusCode.OK)
-
-            val reqDate = call.parameters["date"] ?: return@get call.respondText(
-                "Malformed date", status=HttpStatusCode.BadRequest
-            )
-            val listDate: List<Int> = reqDate.split("-").map {it.toInt()}
-            val date = LocalDate.of(listDate[0], listDate[1], listDate[2])
-            val dispatches = repo.getDispatchesByDate(date)
-            call.respond(dispatches)
+            val id = call.receive<String>()
+            val dispatch = ObjectId(id).toId<Dispatch>()
+            repo.deleteDispatchById(dispatch)
+            call.respond("deleted!")
         }
 
-        post("/update/{id}") {
-            val id = call.parameters["id"] ?: return@post call.respondText(
-                "Malformed id", status=HttpStatusCode.BadRequest
-            )
-            val objId: ObjectId
-            try {
-                objId = ObjectId(id)
-            } catch (e: IllegalArgumentException) {
-                return@post call.respondText(
-                    "Malformed id", status=HttpStatusCode.BadRequest
-                )
-            }
-            repo.updateDispatchById(objId.toId(), call.receive()) ?: return@post call.respondText(
-                "Cannot find that dispatch...", status= HttpStatusCode.NotFound
-            )
+        post("/update/") {
             call.response.status(HttpStatusCode.OK)
-            call.respond("$id updated")
-        }
-
-        get("/get/{id}") {
-
-            val id = call.parameters["id"] ?: return@get call.respondText(
-                "Malformed id", status=HttpStatusCode.BadRequest
-            )
-
-            val objId: ObjectId
-            try {
-                objId = ObjectId(id)
-            } catch (e: IllegalArgumentException) {
-                return@get call.respondText(
-                    "Malformed id", status=HttpStatusCode.BadRequest
-                )
-            }
-
-            val dispatch = repo.getDispatchById(objId.toId()) ?: return@get call.respondText(
-                "Cannot find that dispatch...", status= HttpStatusCode.NotFound
-            )
-
-            call.response.status(HttpStatusCode.OK)
-            call.respond(dispatch)
-        }
-
-        post("/addspeeds/{id}") {
-            val id = call.parameters["id"] ?: return@post call.respondText(
-                "Malformed id", status=HttpStatusCode.BadRequest
-            )
-            val objId: ObjectId
-            try {
-                objId = ObjectId(id)
-            } catch (e: IllegalArgumentException) {
-                return@post call.respondText(
-                    "Malformed id", status=HttpStatusCode.BadRequest
-                )
-            }
-            val dispatch = repo.getDispatchById(objId.toId()) ?: return@post call.respondText(
-                "Cannot find that dispatch...", status= HttpStatusCode.NotFound
-            )
-            call.response.status(HttpStatusCode.OK)
-            val speeds = Json.decodeFromString<HashMap<Int, Int?>>(call.receive())
-            println(speeds)
-            repo.addSpeedsToDispatch(dispatch, speeds[4], speeds[3], speeds[2], speeds[1])
-            call.respond("Speeds added")
+            val dispatch = call.receive<Dispatch>()
+            repo.updateDispatchById(dispatch._id, dispatch)
+            call.respond("Done!")
         }
     }
 }

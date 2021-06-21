@@ -66,11 +66,10 @@ class MongoDispatchRepo: DispatchRepoInterface {
         return todaysDispatches.last()
     }
 
-    override fun addSpeedsToDispatch(dispatch: Dispatch, line4: Int?, line3: Int?, line2: Int?, line1: Int?) {
-        dispatch.riders[4]?.speed = line4
-        dispatch.riders[3]?.speed = line3
-        dispatch.riders[2]?.speed = line2
-        dispatch.riders[1]?.speed = line1
+    override fun addSpeedsToDispatch(id: Id<Dispatch>, line: Int?, speed: Int?) {
+        val dispatch = getDispatchById(id)
+        if (dispatch == null) return
+        dispatch.riders[line]?.speed = speed
         updateDispatchById(dispatch._id, dispatch)
     }
 }
