@@ -47,15 +47,6 @@ class MongoDispatchRepo: DispatchRepoInterface {
         return null
     }
 
-    override fun updateLastDispatch(update: Dispatch): Boolean {
-        val lastDispatch = getLastDispatch() ?: return false
-        update.time = lastDispatch.time
-        update.date = lastDispatch.date
-        update._id = lastDispatch._id
-        windsData.updateOneById(lastDispatch._id, update)
-        return true
-    }
-
     override fun deleteDispatchById(id: Id<Dispatch>) {
         windsData.deleteOne(Dispatch::_id eq id)
     }

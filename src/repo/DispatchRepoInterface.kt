@@ -7,18 +7,10 @@ import org.litote.kmongo.Id
 interface DispatchRepoInterface {
 
     fun createDispatch(dispatch: Dispatch)
-
     fun getAllDispatches(): Collection<Dispatch>
     fun getDispatchesByDate(date: LocalDate): Collection<Dispatch>
     fun getDispatchesByDateRange(start: LocalDate, end: LocalDate): Collection<Dispatch>
     fun getDispatchById(id: Id<Dispatch>): Dispatch?
-
     fun updateDispatchById(id: Id<Dispatch>, update: Dispatch): Dispatch?
-    fun updateLastDispatch(update: Dispatch): Boolean
-
     fun deleteDispatchById(id: Id<Dispatch>)
-
-    fun getLastDispatch(): Dispatch? 
-    fun addSpeedsToDispatch(id: Id<Dispatch>, line: Int?, speed: Int?)
-
 }
