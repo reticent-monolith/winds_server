@@ -58,7 +58,7 @@ fun Application.module(testing: Boolean = false) {
             call.response.status(HttpStatusCode.OK)
             val dispatch = call.receive<Dispatch>()
             repo.createDispatch(dispatch)
-            call.respond(dispatch._id)
+            call.respond(dispatch)
         }
 
         post("/delete/") {
@@ -66,14 +66,14 @@ fun Application.module(testing: Boolean = false) {
             val id = call.receive<String>()
             val dispatch = ObjectId(id).toId<Dispatch>()
             repo.deleteDispatchById(dispatch)
-            call.respond("deleted!")
+            call.respond("$id deleted!")
         }
 
         post("/update/") {
             call.response.status(HttpStatusCode.OK)
             val dispatch = call.receive<Dispatch>()
             repo.updateDispatchById(dispatch._id, dispatch)
-            call.respond("Done!")
+            call.respond(dispatch)
         }
     }
 }

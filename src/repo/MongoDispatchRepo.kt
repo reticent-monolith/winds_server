@@ -59,17 +59,5 @@ class MongoDispatchRepo: DispatchRepoInterface {
     override fun deleteDispatchById(id: Id<Dispatch>) {
         windsData.deleteOne(Dispatch::_id eq id)
     }
-
-    override fun getLastDispatch(): Dispatch? {
-        val todaysDispatches = getDispatchesByDate(LocalDate.now())
-        if (todaysDispatches.isEmpty()) return null
-        return todaysDispatches.last()
-    }
-
-    override fun addSpeedsToDispatch(id: Id<Dispatch>, line: Int?, speed: Int?) {
-        val dispatch = getDispatchById(id)
-        if (dispatch == null) return
-        dispatch.riders[line]?.speed = speed
-        updateDispatchById(dispatch._id, dispatch)
-    }
+    
 }
