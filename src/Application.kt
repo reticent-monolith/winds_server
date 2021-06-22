@@ -46,7 +46,6 @@ fun Application.module(testing: Boolean = false) {
         anyHost()
     }
 
-
     routing {
         get("/all/") {
             call.response.status(HttpStatusCode.OK)
@@ -73,6 +72,16 @@ fun Application.module(testing: Boolean = false) {
             call.response.status(HttpStatusCode.OK)
             val dispatch = call.receive<Dispatch>()
             repo.updateDispatchById(dispatch._id, dispatch)
+            call.respond(dispatch)
+        }
+
+
+        post("/debug/") {
+            call.response.status(HttpStatusCode.OK)
+            val dispatch = call.receive<String>()
+            println()
+            println(dispatch)
+            println()
             call.respond(dispatch)
         }
     }

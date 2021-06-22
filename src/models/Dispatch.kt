@@ -14,10 +14,10 @@ data class Dispatch(
         4 to null
     ),
     var comment: String = "",
-    var wind_degrees: Int,
-    var wind_speed: Double,
-    var winds_instructor: String,
-    var bt_radio: String,
+    var windDegrees: Int,
+    var windSpeed: Double,
+    var windsInstructor: String,
+    var btRadio: String,
     var _id: Id<Dispatch> = newId(),
     var date: LocalDate = LocalDate.now(),
     var time: LocalTime = LocalTime.now()
