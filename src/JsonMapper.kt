@@ -10,7 +10,7 @@ object JsonMapper {
     val defaultMapper: ObjectMapper = jacksonObjectMapper()
 
     init {
-//        defaultMapper.configure(SerializationFeature.INDENT_OUTPUT, true)
+        defaultMapper.configure(SerializationFeature.INDENT_OUTPUT, true)
         defaultMapper.registerModule(JavaTimeModule())
         defaultMapper.registerModule(IdJacksonModule())
     }
