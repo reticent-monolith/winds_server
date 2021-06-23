@@ -2,8 +2,7 @@ package com.reticentmonolith.models
 
 
 import org.litote.kmongo.*
-import java.time.LocalDate
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 
 data class Dispatch(
@@ -19,7 +18,6 @@ data class Dispatch(
     var windsInstructor: String,
     var btRadio: String,
     var _id: Id<Dispatch> = newId(),
-    var date: LocalDate = LocalDate.now(),
-    var time: LocalTime = LocalTime.now()
+    var dateTime: String = LocalDateTime.now().toString(),
 )
 

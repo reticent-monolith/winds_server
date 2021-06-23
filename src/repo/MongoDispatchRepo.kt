@@ -23,13 +23,13 @@ class MongoDispatchRepo: DispatchRepoInterface {
         return windsData.find().toList()
     }
 
-    override fun getDispatchesByDate(date: LocalDate): Collection<Dispatch> {
-        return windsData.find(Dispatch::date eq date).toList()
-    }
+    // override fun getDispatchesByDate(date: LocalDate): Collection<Dispatch> {
+    //     return windsData.find(Dispatch::date eq date).toList()
+    // }
 
-    override fun getDispatchesByDateRange(start: LocalDate, end: LocalDate): Collection<Dispatch> {
-        return windsData.find(Dispatch::date gte(start), Dispatch::date lte(end)).toList()
-    }
+    // override fun getDispatchesByDateRange(start: LocalDate, end: LocalDate): Collection<Dispatch> {
+    //     return windsData.find(Dispatch::date gte(start), Dispatch::date lte(end)).toList()
+    // }
 
     override fun getDispatchById(id: Id<Dispatch>): Dispatch? {
         return windsData.findOneById(id)
@@ -38,8 +38,11 @@ class MongoDispatchRepo: DispatchRepoInterface {
     override fun updateDispatchById(id: Id<Dispatch>, update: Dispatch): Dispatch? {
         val oldDispatch = getDispatchById(id)
         if (oldDispatch != null) {
-            update.time = oldDispatch.time
-            update.date = oldDispatch.date
+            // update.time = oldDispatch.time
+            // update.date = oldDispatch.date
+
+            update.dateTime = oldDispatch.dateTime
+
             update._id = oldDispatch._id
             windsData.updateOneById(id, update)
             return update
