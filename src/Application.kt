@@ -75,6 +75,12 @@ fun Application.module(testing: Boolean = false) {
             call.respond(dispatch)
         }
 
+        delete("/purge/") {
+            call.response.status(HttpStatusCode.OK)
+            repo.clearCollection()
+            call.respond("All gone!")
+        }
+
 
         post("/debug/") {
             call.response.status(HttpStatusCode.OK)

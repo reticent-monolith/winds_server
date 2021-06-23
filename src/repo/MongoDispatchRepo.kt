@@ -50,5 +50,9 @@ class MongoDispatchRepo: DispatchRepoInterface {
     override fun deleteDispatchById(id: Id<Dispatch>) {
         windsData.deleteOne(Dispatch::_id eq id)
     }
+
+    fun clearCollection() {
+        windsData.deleteMany("{}")
+    }
     
 }
