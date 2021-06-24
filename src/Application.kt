@@ -47,20 +47,20 @@ fun Application.module(testing: Boolean = false) {
     }
 
     routing {
-        get("/all/") {
+        get("/all") {
             call.response.status(HttpStatusCode.OK)
             val dispatches = repo.getAllDispatches()
             call.respond(dispatches)
         }
 
-        post("/add/") {
+        post("/add") {
             call.response.status(HttpStatusCode.OK)
             val dispatch = call.receive<Dispatch>()
             repo.createDispatch(dispatch)
             call.respond(dispatch)
         }
 
-        post("/delete/") {
+        post("/delete") {
             call.response.status(HttpStatusCode.OK)
             val id = call.receive<String>()
             val dispatch = ObjectId(id).toId<Dispatch>()
@@ -68,21 +68,31 @@ fun Application.module(testing: Boolean = false) {
             call.respond("$id deleted!")
         }
 
-        post("/update/") {
+        get("/get/{id}") {
+            call.response.status(HttpStatusCode.OK)
+            val idString = call.parameters["id"]
+            val id = ObjectId(idString).toId<Dispatch>()
+            val dispatch = repo.getDispatchById(id)
+            if (dispatch != null) {
+                call.respond(dispatch)
+            }
+        }
+
+        post("/update") {
             call.response.status(HttpStatusCode.OK)
             val dispatch = call.receive<Dispatch>()
             repo.updateDispatchById(dispatch._id, dispatch)
             call.respond(dispatch)
         }
 
-        delete("/purge/") {
+        delete("/purge") {
             call.response.status(HttpStatusCode.OK)
             repo.clearCollection()
             call.respond("All gone!")
         }
 
 
-        post("/debug/") {
+        post("/debug") {
             call.response.status(HttpStatusCode.OK)
             val dispatch = call.receive<String>()
             println()
