@@ -2,14 +2,12 @@ package com.reticentmonolith.repo
 
 import com.mongodb.client.MongoDatabase
 import com.reticentmonolith.models.Dispatch
-import org.bson.types.ObjectId
-import java.time.LocalDate
-
 import org.litote.kmongo.*
-import org.litote.kmongo.id.toId
+import java.time.LocalDate
 
 class MongoDispatchRepo: DispatchRepoInterface {
 
+    // private val client = KMongo.createClient("mongodb://172.17.0.2:27017")
     private val client = KMongo.createClient()
     private val database: MongoDatabase = client.getDatabase("zw")
     private val windsData = database.getCollection<Dispatch>("winds")
@@ -23,13 +21,23 @@ class MongoDispatchRepo: DispatchRepoInterface {
         return windsData.find().toList()
     }
 
-    // override fun getDispatchesByDate(date: LocalDate): Collection<Dispatch> {
-    //     return windsData.find(Dispatch::date eq date).toList()
-    // }
+    override fun getDispatchesByDate(requestDate: String): Collection<Dispatch> {
+        val dispatches = this.getAllDispatches()
+        val filtered = dispatches.filter {
+            val date = it.dateTime.split("T")[0]
+            requestDate == date
+        }
+        return filtered
+    }
 
-    // override fun getDispatchesByDateRange(start: LocalDate, end: LocalDate): Collection<Dispatch> {
-    //     return windsData.find(Dispatch::date gte(start), Dispatch::date lte(end)).toList()
-    // }
+    override fun getDispatchesByDateRange(start: LocalDate, end: LocalDate): Collection<Dispatch> {
+        val dispatches = this.getAllDispatches()
+        val filtered = dispatches.filter {
+            val date = LocalDate.parse(it.dateTime.split("T").first())
+            (date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end))
+        }
+        return filtered
+    }
 
     override fun getDispatchById(id: Id<Dispatch>): Dispatch? {
         return windsData.findOneById(id)
@@ -38,11 +46,7 @@ class MongoDispatchRepo: DispatchRepoInterface {
     override fun updateDispatchById(id: Id<Dispatch>, update: Dispatch): Dispatch? {
         val oldDispatch = getDispatchById(id)
         if (oldDispatch != null) {
-            // update.time = oldDispatch.time
-            // update.date = oldDispatch.date
-
             update.dateTime = oldDispatch.dateTime
-
             update._id = oldDispatch._id
             windsData.updateOneById(id, update)
             return update

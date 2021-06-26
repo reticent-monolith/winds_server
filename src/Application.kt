@@ -47,9 +47,29 @@ fun Application.module(testing: Boolean = false) {
     }
 
     routing {
-        get("/all") {
+//        Getting ALL is bad with large databases...
+//        get("/all") {
+//            call.response.status(HttpStatusCode.OK)
+//            val dispatches = repo.getAllDispatches()
+//            call.respond(dispatches)
+//        }
+
+        get("/today") {
             call.response.status(HttpStatusCode.OK)
-            val dispatches = repo.getAllDispatches()
+            call.respond(repo.getDispatchesByDate(LocalDate.now().toString()))
+        }
+
+        get("/bydate/{date}") {
+            call.response.status(HttpStatusCode.OK)
+            val date = call.parameters["date"]
+            call.respond(repo.getDispatchesByDate(LocalDate.parse(date).toString()))
+        }
+
+        get("/bydaterange/{start}_{end}") {
+            call.response.status(HttpStatusCode.OK)
+            val start = call.parameters["start"]
+            val end = call.parameters["end"]
+            val dispatches = repo.getDispatchesByDateRange(LocalDate.parse(start), LocalDate.parse(end))
             call.respond(dispatches)
         }
 
@@ -60,7 +80,7 @@ fun Application.module(testing: Boolean = false) {
             call.respond(dispatch)
         }
 
-        post("/delete") {
+        delete("/delete") {
             call.response.status(HttpStatusCode.OK)
             val id = call.receive<String>()
             val dispatch = ObjectId(id).toId<Dispatch>()
@@ -68,7 +88,7 @@ fun Application.module(testing: Boolean = false) {
             call.respond("$id deleted!")
         }
 
-        get("/get/{id}") {
+        get("/byid/{id}") {
             call.response.status(HttpStatusCode.OK)
             val idString = call.parameters["id"]
             val id = ObjectId(idString).toId<Dispatch>()
