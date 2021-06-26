@@ -12,10 +12,6 @@ import io.ktor.request.*
 import org.bson.types.ObjectId
 import org.litote.kmongo.id.toId
 import java.time.LocalDate
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import org.litote.kmongo.Id
-import java.lang.IllegalArgumentException
 
 
 fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
@@ -65,10 +61,12 @@ fun Application.module(testing: Boolean = false) {
             call.respond(repo.getDispatchesByDate(LocalDate.parse(date).toString()))
         }
 
-        get("/bydaterange/{start}_{end}") {
+        get("/bydaterange") {
             call.response.status(HttpStatusCode.OK)
-            val start = call.parameters["start"]
-            val end = call.parameters["end"]
+            val start = call.request.queryParameters["start"]
+            println(start)
+            val end = call.request.queryParameters["end"]
+            println(end)
             val dispatches = repo.getDispatchesByDateRange(LocalDate.parse(start), LocalDate.parse(end))
             call.respond(dispatches)
         }
@@ -80,7 +78,7 @@ fun Application.module(testing: Boolean = false) {
             call.respond(dispatch)
         }
 
-        delete("/delete") {
+        post("/delete") {
             call.response.status(HttpStatusCode.OK)
             val id = call.receive<String>()
             val dispatch = ObjectId(id).toId<Dispatch>()
