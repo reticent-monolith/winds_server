@@ -49,5 +49,14 @@ dependencies {
 
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3"
 
+<<<<<<< HEAD
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1"
+=======
+
+
+
+
+
+
+>>>>>>> parent of b20eb26... Mongo doesn't like purely Serialization
 }
