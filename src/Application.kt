@@ -30,37 +30,36 @@ fun Application.module(testing: Boolean = false) {
     }
 
     install(CORS) {
+        method(HttpMethod.Post)
         method(HttpMethod.Options)
         method(HttpMethod.Put)
         method(HttpMethod.Delete)
         method(HttpMethod.Patch)
+
         header(HttpHeaders.Authorization)
         header(HttpHeaders.AccessControlAllowOrigin)
+        header(HttpHeaders.Accept)
+        header(HttpHeaders.ContentLanguage)
+        header(HttpHeaders.ContentType)
+
         allowNonSimpleContentTypes = true
         allowCredentials = true
         allowSameOrigin = true
-        anyHost()
+
+        host("winds.dev", subDomains = listOf("front","back"), schemes=listOf("https"))
+
     }
 
     routing {
-//        Getting ALL is bad with large databases...
-//        get("/all") {
-//            call.response.status(HttpStatusCode.OK)
-//            val dispatches = repo.getAllDispatches()
-//            call.respond(dispatches)
-//        }
-
         get("/today") {
             call.response.status(HttpStatusCode.OK)
             call.respond(repo.getDispatchesByDate(LocalDate.now().toString()))
         }
-
         get("/bydate/{date}") {
             call.response.status(HttpStatusCode.OK)
             val date = call.parameters["date"]
             call.respond(repo.getDispatchesByDate(LocalDate.parse(date).toString()))
         }
-
         get("/bydaterange") {
             call.response.status(HttpStatusCode.OK)
             val start = call.request.queryParameters["start"]
@@ -70,22 +69,6 @@ fun Application.module(testing: Boolean = false) {
             val dispatches = repo.getDispatchesByDateRange(LocalDate.parse(start), LocalDate.parse(end))
             call.respond(dispatches)
         }
-
-        post("/add") {
-            call.response.status(HttpStatusCode.OK)
-            val dispatch = call.receive<Dispatch>()
-            repo.createDispatch(dispatch)
-            call.respond(dispatch)
-        }
-
-        post("/delete") {
-            call.response.status(HttpStatusCode.OK)
-            val id = call.receive<String>()
-            val dispatch = ObjectId(id).toId<Dispatch>()
-            repo.deleteDispatchById(dispatch)
-            call.respond("$id deleted!")
-        }
-
         get("/byid/{id}") {
             call.response.status(HttpStatusCode.OK)
             val idString = call.parameters["id"]
@@ -96,27 +79,40 @@ fun Application.module(testing: Boolean = false) {
             }
         }
 
+        post("/add") {
+            call.response.status(HttpStatusCode.OK)
+            val dispatch = call.receive<Dispatch>()
+            repo.createDispatch(dispatch)
+            call.respond(dispatch)
+        }
+        options("/add") {
+            call.response.status(HttpStatusCode.OK)
+            call.response.headers.append(HttpHeaders.AccessControlAllowHeaders, "content-type")
+            call.respond("all good!")
+        }
+        post("/delete") {
+            call.response.status(HttpStatusCode.OK)
+            val id = call.receive<String>()
+            val dispatch = ObjectId(id).toId<Dispatch>()
+            repo.deleteDispatchById(dispatch)
+            call.respond("$id deleted!")
+        }
         post("/update") {
             call.response.status(HttpStatusCode.OK)
             val dispatch = call.receive<Dispatch>()
             repo.updateDispatchById(dispatch._id, dispatch)
             call.respond(dispatch)
         }
+        options("/update") {
+            call.response.status(HttpStatusCode.OK)
+            call.response.headers.append(HttpHeaders.AccessControlAllowHeaders, "content-type")
+            call.respond("all good!")
+        }
 
         delete("/purge") {
             call.response.status(HttpStatusCode.OK)
             repo.clearCollection()
             call.respond("All gone!")
-        }
-
-
-        post("/debug") {
-            call.response.status(HttpStatusCode.OK)
-            val dispatch = call.receive<String>()
-            println()
-            println(dispatch)
-            println()
-            call.respond(dispatch)
         }
     }
 }
