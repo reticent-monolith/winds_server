@@ -46,7 +46,8 @@ fun Application.module(testing: Boolean = false) {
         allowCredentials = true
         allowSameOrigin = true
 
-        host("winds.dev", subDomains = listOf("front","back"), schemes=listOf("https"))
+        host("winds.dev", subDomains = listOf("front"), schemes=listOf("https"))
+        host("reticent-monolith.com", subDomains = listOf("winds"), schemes=listOf("https"))
 
     }
 
