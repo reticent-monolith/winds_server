@@ -48,6 +48,9 @@ fun Application.module(testing: Boolean = false) {
 
         host("winds.dev", subDomains = listOf("front"), schemes=listOf("https"))
         host("reticent-monolith.com", subDomains = listOf("winds"), schemes=listOf("https"))
+        host("192.168.1.244:3000")
+        host("192.168.1.133:3000")
+        host("localhost:3000")
 
     }
 
