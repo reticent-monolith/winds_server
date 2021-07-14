@@ -32,9 +32,6 @@ fun Application.module(testing: Boolean = false) {
     install(CORS) {
         method(HttpMethod.Post)
         method(HttpMethod.Options)
-        method(HttpMethod.Put)
-        method(HttpMethod.Delete)
-        method(HttpMethod.Patch)
 
         header(HttpHeaders.Authorization)
         header(HttpHeaders.AccessControlAllowOrigin)
@@ -46,24 +43,18 @@ fun Application.module(testing: Boolean = false) {
         allowCredentials = true
         allowSameOrigin = true
 
-        host("winds.dev", subDomains = listOf("front"), schemes=listOf("https"))
         host("reticent-monolith.com", subDomains = listOf("winds"), schemes=listOf("https"))
-        host("192.168.1.244:3000")
-        host("192.168.1.133:3000")
-        host("localhost:3000")
-
     }
 
     routing {
-        get("/today") {
-            call.response.status(HttpStatusCode.OK)
-            call.respond(repo.getDispatchesByDate(LocalDate.now().toString()))
-        }
+        // Get dispatches by specified date
         get("/bydate/{date}") {
             call.response.status(HttpStatusCode.OK)
             val date = call.parameters["date"]
             call.respond(repo.getDispatchesByDate(LocalDate.parse(date).toString()))
         }
+
+        // Get dispatches in specified date range (not used in front end)
         get("/bydaterange") {
             call.response.status(HttpStatusCode.OK)
             val start = call.request.queryParameters["start"]
@@ -73,6 +64,8 @@ fun Application.module(testing: Boolean = false) {
             val dispatches = repo.getDispatchesByDateRange(LocalDate.parse(start), LocalDate.parse(end))
             call.respond(dispatches)
         }
+
+        // Get dispatch by ID
         get("/byid/{id}") {
             call.response.status(HttpStatusCode.OK)
             val idString = call.parameters["id"]
@@ -83,40 +76,39 @@ fun Application.module(testing: Boolean = false) {
             }
         }
 
+        // Add a dispatch
         post("/add") {
             call.response.status(HttpStatusCode.OK)
             val dispatch = call.receive<Dispatch>()
             repo.createDispatch(dispatch)
-            call.respond(dispatch)
+            call.respond(dispatch._id)
         }
         options("/add") {
             call.response.status(HttpStatusCode.OK)
             call.response.headers.append(HttpHeaders.AccessControlAllowHeaders, "content-type")
             call.respond("all good!")
         }
+
+        // Delete a dispatch
         post("/delete") {
             call.response.status(HttpStatusCode.OK)
             val id = call.receive<String>()
             val dispatch = ObjectId(id).toId<Dispatch>()
             repo.deleteDispatchById(dispatch)
-            call.respond("$id deleted!")
+            call.respond(id)
         }
+
+        // Update a dispatch
         post("/update") {
             call.response.status(HttpStatusCode.OK)
             val dispatch = call.receive<Dispatch>()
             repo.updateDispatchById(dispatch._id, dispatch)
-            call.respond(dispatch)
+            call.respond(dispatch._id)
         }
         options("/update") {
             call.response.status(HttpStatusCode.OK)
             call.response.headers.append(HttpHeaders.AccessControlAllowHeaders, "content-type")
             call.respond("all good!")
-        }
-
-        delete("/purge") {
-            call.response.status(HttpStatusCode.OK)
-            repo.clearCollection()
-            call.respond("All gone!")
         }
     }
 }

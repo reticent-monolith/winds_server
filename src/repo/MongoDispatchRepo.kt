@@ -7,8 +7,8 @@ import java.time.LocalDate
 
 class MongoDispatchRepo: DispatchRepoInterface {
 
-    // private val client = KMongo.createClient("mongodb://172.17.0.2:27017")
-    private val client = KMongo.createClient()
+    private val client = KMongo.createClient("mongodb://db:27017")
+    // private val client = KMongo.createClient()
     private val database: MongoDatabase = client.getDatabase("zw")
     private val windsData = database.getCollection<Dispatch>("winds")
 
