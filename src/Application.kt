@@ -43,7 +43,10 @@ fun Application.module(testing: Boolean = false) {
         allowCredentials = true
         allowSameOrigin = true
 
-        host("reticent-monolith.com", subDomains = listOf("winds"), schemes=listOf("https"))
+        // TODO set this to just the one host for production!
+        // Annoyingly only allows one host, if more are specified it just overwrites
+        // host("reticent-monolith.com", subDomains = listOf("winds"), schemes=listOf("https"))
+        anyHost()
     }
 
     routing {
