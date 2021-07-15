@@ -7,8 +7,8 @@ import java.time.LocalDate
 
 class MongoDispatchRepo: DispatchRepoInterface {
 
-    private val client = KMongo.createClient("mongodb://db:27017")
-    // private val client = KMongo.createClient()
+    // private val client = KMongo.createClient("mongodb://db:27017")
+    private val client = KMongo.createClient("mongodb://192.168.1.133:27017")
     private val database: MongoDatabase = client.getDatabase("zw")
     private val windsData = database.getCollection<Dispatch>("winds")
 
@@ -24,8 +24,7 @@ class MongoDispatchRepo: DispatchRepoInterface {
     override fun getDispatchesByDate(requestDate: String): Collection<Dispatch> {
         val dispatches = this.getAllDispatches()
         val filtered = dispatches.filter {
-            val date = it.dateTime.split("T")[0]
-            requestDate == date
+            requestDate == it.date
         }
         return filtered
     }
@@ -33,7 +32,7 @@ class MongoDispatchRepo: DispatchRepoInterface {
     override fun getDispatchesByDateRange(start: LocalDate, end: LocalDate): Collection<Dispatch> {
         val dispatches = this.getAllDispatches()
         val filtered = dispatches.filter {
-            val date = LocalDate.parse(it.dateTime.split("T").first())
+            val date = LocalDate.parse(it.date)
             (date.isEqual(start) || date.isAfter(start)) && (date.isEqual(end) || date.isBefore(end))
         }
         return filtered
@@ -46,7 +45,8 @@ class MongoDispatchRepo: DispatchRepoInterface {
     override fun updateDispatchById(id: Id<Dispatch>, update: Dispatch): Dispatch? {
         val oldDispatch = getDispatchById(id)
         if (oldDispatch != null) {
-            update.dateTime = oldDispatch.dateTime
+            update.date = oldDispatch.date
+            update.time = oldDispatch.time
             update._id = oldDispatch._id
             windsData.updateOneById(id, update)
             return update

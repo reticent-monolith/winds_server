@@ -43,8 +43,6 @@ fun Application.module(testing: Boolean = false) {
         allowCredentials = true
         allowSameOrigin = true
 
-        // TODO set this to just the one host for production!
-        // Annoyingly only allows one host, if more are specified it just overwrites
         // host("reticent-monolith.com", subDomains = listOf("winds"), schemes=listOf("https"))
         anyHost()
     }
@@ -53,8 +51,9 @@ fun Application.module(testing: Boolean = false) {
         // Get dispatches by specified date
         get("/bydate/{date}") {
             call.response.status(HttpStatusCode.OK)
-            val date = call.parameters["date"]
-            call.respond(repo.getDispatchesByDate(LocalDate.parse(date).toString()))
+            val date = call.parameters["date"]?.replace('-', '/')
+            println(date)
+            call.respond(repo.getDispatchesByDate(date!!))
         }
 
         // Get dispatches in specified date range (not used in front end)

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+git checkout master
+git merge dev
 gradle clean
 gradle build
 gradle installDist
