@@ -43,7 +43,8 @@ fun Application.module(testing: Boolean = false) {
         allowCredentials = true
         allowSameOrigin = true
 
-        host("reticent-monolith.com", subDomains = listOf("winds"), schemes=listOf("https"))
+        // host("reticent-monolith.com", subDomains = listOf("winds"), schemes=listOf("https"))
+        anyHost()
     }
 
     routing {
@@ -51,6 +52,7 @@ fun Application.module(testing: Boolean = false) {
         get("/bydate/{date}") {
             call.response.status(HttpStatusCode.OK)
             val date = call.parameters["date"]
+            date?.replace('-', '/')
             call.respond(repo.getDispatchesByDate(LocalDate.parse(date).toString()))
         }
 
