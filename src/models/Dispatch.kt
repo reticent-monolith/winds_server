@@ -19,7 +19,7 @@ data class Dispatch(
     var windsInstructor: String,
     var btRadio: String,
     var _id: Id<Dispatch> = newId(),
-    var date: String = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-    var time: String = LocalTime.now().format(DateTimeFormatter.ofPattern("hh:mm:ss"))
+    var date: String,
+    var time: String
 )
 
