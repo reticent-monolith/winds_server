@@ -4,11 +4,16 @@ import com.mongodb.client.MongoDatabase
 import com.reticentmonolith.models.Dispatch
 import org.litote.kmongo.*
 import java.time.LocalDate
+import java.net.UnknownHostException
 
 class MongoDispatchRepo: DispatchRepoInterface {
 
-    private val client = KMongo.createClient("mongodb://db:27017")
-    // private val client = KMongo.createClient("mongodb://192.168.1.133:27017")
+    private val client = try {
+        KMongo.createClient("mongodb://db:27017")
+    } catch (e: Exception) {
+        println("Running on dev db!")
+        KMongo.createClient("mongodb://localhost:27017")
+    }
     private val database: MongoDatabase = client.getDatabase("zw")
     private val windsData = database.getCollection<Dispatch>("winds")
 
